@@ -97,10 +97,10 @@ export default function App() {
           </span>
           <div className="min-w-0">
             <div className="text-xl font-bold tracking-tight" style={{ color: "var(--ink)" }}>
-              Corridor
+              StormHaul
             </div>
             <div className="text-sm" style={{ color: "var(--muted)" }}>
-              Weather-aware truck routing · safest of 3 routes
+              Weather-aware truck routing
             </div>
           </div>
         </div>

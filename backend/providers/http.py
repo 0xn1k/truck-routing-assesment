@@ -9,5 +9,5 @@ specifically for requests whose User-Agent identifies as the `python-httpx`
 library (a common anti-bot measure), which is httpx's unmodified default.
 """
 
-USER_AGENT = "Corridor/1.0 (weather-aware truck routing demo app)"
+USER_AGENT = "StormHaul/1.0 (weather-aware truck routing demo app)"
 DEFAULT_HEADERS = {"User-Agent": USER_AGENT}
