@@ -10,7 +10,12 @@ import { CHECKPOINT_LAYER_ID } from "./CheckpointLayer";
  * Low, orange/red where High/Severe — instead of one flat colour with risk
  * only visible on the small checkpoint dots. Requires the route's source to
  * set `lineMetrics: true` (below) so `["line-progress"]` is available. */
-function riskGradient(route: RouteResult): (string | number)[] {
+// MapLibre expression arrays nest arbitrarily (["interpolate", ["linear"],
+// ["line-progress"], ...]), which doesn't fit a flat (string | number)[] —
+// maplibre-gl's own expression type isn't exported in a form worth
+// importing for one function, so this stays loosely typed; the call site
+// already casts the result for the paint property.
+function riskGradient(route: RouteResult): unknown[] {
   const total = route.distance_mi;
   const sorted = [...route.checkpoints].sort((a, b) => a.mile - b.mile);
   let last = -1;
