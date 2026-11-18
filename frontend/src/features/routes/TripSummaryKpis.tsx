@@ -36,15 +36,22 @@ export function TripSummaryKpis({ route, letter, departureIso }: TripSummaryKpis
   return (
     <section
       aria-label="Trip summary"
-      className="rounded-[20px] p-6"
+      className="rounded-[20px] p-4 sm:p-6"
       style={{ background: "var(--surface)", border: "1px solid var(--line)" }}
     >
       <SectionHeader>Trip summary · recommended route</SectionHeader>
-      <div className="mt-[18px] flex flex-wrap gap-2.5">
+      {/* flex-wrap wrapped fine at desktop width (tiles hug their own
+          content), but on a phone none of the 6 tiles fit side by side, so
+          they each fell to their own full-width row — a tall vertical
+          stack instead of a compact summary. flex-nowrap + overflow-x-auto
+          turns that into a horizontal scroll strip instead, same as the
+          wrapping grid cost nothing extra at widths where everything
+          already fits (no overflow, so no scrollbar appears). */}
+      <div className="-mx-4 mt-[18px] flex flex-nowrap gap-2.5 overflow-x-auto px-4 pb-1 sm:-mx-6 sm:px-6">
         {tiles.map(({ icon: Icon, label, value, warn }) => (
           <div
             key={label}
-            className="flex min-w-0 items-center gap-2.5 rounded-[14px] p-3"
+            className="flex min-w-0 flex-none items-center gap-2.5 rounded-[14px] p-3"
             style={{ background: "var(--surface-2)", border: "1px solid var(--line)" }}
           >
             <span

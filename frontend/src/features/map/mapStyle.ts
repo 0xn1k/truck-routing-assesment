@@ -1,5 +1,3 @@
-import type { Theme } from "@/lib/theme";
-
 // Stadia Maps is already this app's routing provider (providers/routing/
 // valhalla.py) — it also hosts map tiles on the same free account, so the
 // terrain basemap below adds no new paid service. Tile requests from
@@ -15,9 +13,9 @@ function stadiaStyleUrl(style: string): string {
 
 /** Same terrain style in both themes, by design — the map's colours are
  * meant to match exactly, not switch to a separate cool-toned dark vector
- * style the way the rest of the UI switches. `theme` stays a parameter
- * (rather than deleting it) since route casings/heatmap contrast still key
- * off it elsewhere (frontend/README.md Section 9.8). */
-export function basemapStyleUrl(_theme: Theme): string {
+ * style the way the rest of the UI switches (route casings/heatmap
+ * contrast still key off theme directly in RouteLayer/HeatmapLayer,
+ * frontend/README.md Section 9.8 — just not through this function). */
+export function basemapStyleUrl(): string {
   return stadiaStyleUrl("stamen_terrain");
 }

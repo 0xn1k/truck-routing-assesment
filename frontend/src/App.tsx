@@ -89,7 +89,7 @@ export default function App() {
   return (
     <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <header
-        className="flex flex-wrap items-center justify-between gap-4 px-7 py-3.5"
+        className="flex flex-wrap items-center justify-between gap-4 px-4 py-3.5 sm:px-7"
         style={{ background: "var(--surface)", borderBottom: "1px solid var(--line)" }}
       >
         <div className="flex min-w-0 items-center gap-3.5">
@@ -131,7 +131,7 @@ export default function App() {
         </div>
       </header>
 
-      <div className="mx-auto flex max-w-[1680px] flex-wrap items-start gap-6 px-7 py-6">
+      <div className="mx-auto flex max-w-[1680px] flex-wrap items-start gap-6 px-4 py-5 sm:px-7 sm:py-6">
         <div
           className={`flex w-full flex-col gap-3 desktop:flex-none ${
             isCollapsed ? "desktop:w-[200px]" : "desktop:w-[340px]"
@@ -169,7 +169,7 @@ export default function App() {
           )}
           <aside
             aria-label="Trip details"
-            className="w-full rounded-[20px] p-6"
+            className="w-full rounded-[20px] p-4 sm:p-6"
             style={{ background: "var(--surface)", border: "1px solid var(--line)" }}
           >
             <div className="flex items-center justify-between gap-2">
@@ -235,7 +235,7 @@ export default function App() {
             // state reads as "this is where your results will appear", not
             // just a small unrelated notice.
             <div
-              className="flex min-h-[460px] flex-col items-center justify-center gap-5 rounded-[20px] px-6 py-16 text-center"
+              className="flex min-h-[320px] flex-col items-center justify-center gap-5 rounded-[20px] px-4 py-10 text-center sm:min-h-[460px] sm:px-6 sm:py-16"
               style={{ border: "1px dashed var(--line)", background: "var(--surface-2)" }}
             >
               <span
@@ -288,7 +288,7 @@ export default function App() {
 
               <section
                 aria-label="Route map"
-                className="flex min-w-0 flex-col gap-3 rounded-[20px] p-6"
+                className="flex min-w-0 flex-col gap-3 rounded-[20px] p-4 sm:p-6"
                 style={{ background: "var(--surface)", border: "1px solid var(--line)" }}
               >
                 <SectionHeader>Route map</SectionHeader>
@@ -298,8 +298,9 @@ export default function App() {
                     instead of the visible area, which threw fitBounds
                     off badly. A fixed height keeps the measurement (and
                     the fit) correct regardless of what else is on the
-                    page. */}
-                <div className="h-[520px]">
+                    page. Shorter on mobile so the map doesn't eat the
+                    whole viewport above everything else. */}
+                <div className="h-[360px] sm:h-[520px]">
                   <TripMap
                     routes={plan.routes}
                     selectedRouteId={selectedRouteId ?? plan.recommended_route_id}
