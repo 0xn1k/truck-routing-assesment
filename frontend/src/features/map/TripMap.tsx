@@ -154,7 +154,7 @@ export function TripMap({
     >
       <Map
         ref={mapRef}
-        mapStyle={basemapStyleUrl(theme)}
+        mapStyle={basemapStyleUrl()}
         initialViewState={{ longitude: -95, latitude: 40, zoom: 4 }}
         interactiveLayerIds={interactiveLayerIds}
         onClick={handleMapClick}
