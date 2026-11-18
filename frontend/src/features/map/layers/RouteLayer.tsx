@@ -1,8 +1,31 @@
 import { useMemo } from "react";
 import { Layer, Source } from "react-map-gl/maplibre";
 import type { RouteResult } from "@/api/types";
+import { riskColorResolved } from "@/lib/risk";
 import { cssVar } from "@/lib/theme";
 import { CHECKPOINT_LAYER_ID } from "./CheckpointLayer";
+
+/** A MapLibre `line-gradient` expression that recolours the route itself
+ * along its length by each checkpoint's actual risk — e.g. green where it's
+ * Low, orange/red where High/Severe — instead of one flat colour with risk
+ * only visible on the small checkpoint dots. Requires the route's source to
+ * set `lineMetrics: true` (below) so `["line-progress"]` is available. */
+function riskGradient(route: RouteResult): (string | number)[] {
+  const total = route.distance_mi;
+  const sorted = [...route.checkpoints].sort((a, b) => a.mile - b.mile);
+  let last = -1;
+  const stops: [number, string][] = sorted.map((cp) => {
+    let t = total > 0 ? cp.mile / total : 0;
+    t = Math.min(1, Math.max(0, t));
+    if (t <= last) t = Math.min(1, last + 0.0001); // line-gradient stops must strictly increase
+    last = t;
+    return [t, riskColorResolved(cp.risk)];
+  });
+  if (stops.length === 0) return ["interpolate", ["linear"], ["line-progress"], 0, cssVar("--accent")];
+  if (stops[0][0] > 0) stops.unshift([0, stops[0][1]]);
+  if (stops[stops.length - 1][0] < 1) stops.push([1, stops[stops.length - 1][1]]);
+  return ["interpolate", ["linear"], ["line-progress"], ...stops.flat()];
+}
 
 interface RouteLayerProps {
   routes: RouteResult[];
@@ -39,15 +62,13 @@ export function RouteLayer({ routes, selectedRouteId, themeVersion }: RouteLayer
   const casingColor = useMemo(() => cssVar("--casing"), [themeVersion]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const accentColor = useMemo(() => cssVar("--accent"), [themeVersion]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const otherColor = useMemo(() => cssVar("--route-other"), [themeVersion]);
-  // In dark mode --casing is the same colour as the page background (a
-  // deliberate near-invisible outline for the selected route's own bold
-  // blue line) — reused for an UNselected route's casing, that meant its
-  // only visible pixels were a thin 3.5px grey line, easily lost against
-  // the heatmap. Unselected routes get their own, visibly distinct casing.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const otherCasingColor = useMemo(() => cssVar("--route-other-casing"), [themeVersion]);
+  // Fixed, not theme-dependent: the map's basemap is the same warm terrain
+  // style in both light and dark page themes now (mapStyle.ts), so an
+  // unselected route needs a colour that reads against THAT (always cream/
+  // green terrain), not against the page background. A light, theme-matched
+  // grey (the old --route-other) nearly disappeared on the cream map.
+  const otherColor = "#4a3b26";
+  const otherCasingColor = "#faf6ef";
 
   const selectedCasingId = `route-${selectedRouteId}-casing`;
   const ordered = useMemo(
@@ -66,7 +87,13 @@ export function RouteLayer({ routes, selectedRouteId, themeVersion }: RouteLayer
           geometry: route.geometry,
         };
         return (
-          <Source key={route.id} id={`route-${route.id}`} type="geojson" data={geojson}>
+          <Source
+            key={route.id}
+            id={`route-${route.id}`}
+            type="geojson"
+            data={geojson}
+            lineMetrics
+          >
             <Layer
               id={`route-${route.id}-casing`}
               type="line"
@@ -74,7 +101,8 @@ export function RouteLayer({ routes, selectedRouteId, themeVersion }: RouteLayer
               layout={{ "line-cap": "round", "line-join": "round" }}
               paint={{
                 "line-color": selected ? casingColor : otherCasingColor,
-                "line-width": selected ? 11 : 7,
+                "line-width": selected ? 12 : 7,
+                "line-opacity": selected ? 1 : 0.85,
               }}
             />
             <Layer
@@ -82,10 +110,28 @@ export function RouteLayer({ routes, selectedRouteId, themeVersion }: RouteLayer
               type="line"
               beforeId={beforeId}
               layout={{ "line-cap": "round", "line-join": "round" }}
-              paint={{
-                "line-color": selected ? accentColor : otherColor,
-                "line-width": selected ? 6 : 4.5,
-              }}
+              paint={
+                selected
+                  ? {
+                      // Bold and coloured by actual risk along its length —
+                      // green where Low, escalating toward red/purple at
+                      // High/Severe/No-Travel checkpoints, same palette the
+                      // checkpoint dots and heatmap use.
+                      "line-color": accentColor,
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      "line-gradient": riskGradient(route) as any,
+                      "line-width": 7,
+                    }
+                  : {
+                      // Unselected routes stay flat (no risk gradient, so
+                      // they don't compete with the selected route's
+                      // colouring) but dark/solid enough to still read
+                      // clearly against the cream terrain basemap.
+                      "line-color": otherColor,
+                      "line-width": 4.5,
+                      "line-opacity": 0.9,
+                    }
+              }
             />
           </Source>
         );

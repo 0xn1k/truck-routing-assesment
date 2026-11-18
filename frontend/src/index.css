@@ -6,31 +6,31 @@
    (frontend/README.md Section 9.2). Light is the :root default; dark
    overrides under [data-theme="dark"], toggled by state/uiStore.ts. */
 :root {
-  --bg: #f6f7f9;
-  --surface: #ffffff;
-  --surface-2: #f3f4f6;
-  --ink: #0f172a;
-  --muted: #5b6474;
-  --line: #e4e7ec;
-  --line-2: #eef0f3;
-  --accent: #2563eb;
-  --accent-tint: #eaf1fe;
+  --bg: #faf6ef;
+  --surface: #fffdfa;
+  --surface-2: #f4eee3;
+  --ink: #241c13;
+  --muted: #8a7a63;
+  --line: #e9e0d0;
+  --line-2: #f0e9db;
+  --accent: #dd8a3d;
+  --accent-tint: #fbefdc;
   --on-accent: #ffffff;
-  --btn: #0f172a;
-  --on-btn: #ffffff;
+  --btn: #e3983e;
+  --on-btn: #3c2a12;
   --rec-bg: #e6f4ec;
   --rec-ink: #166534;
-  --land: #f2f3f0;
-  --casing: #ffffff;
-  --route-other: #6b7280;
-  --route-other-casing: #d1d5db;
-  --input-bg: #ffffff;
-  --input-border: #d5d9e0;
-  --seg-bg: #f1f3f5;
-  --seg-on: #ffffff;
-  --chip: #f1f3f5;
-  --shadow: 0 8px 24px rgba(15, 23, 42, 0.1);
-  --track: #e9ecef;
+  --land: #f2ede1;
+  --casing: #fffdfa;
+  --route-other: #8a7a63;
+  --route-other-casing: #ded2bb;
+  --input-bg: #f8f3ea;
+  --input-border: #e3d7bf;
+  --seg-bg: #f4eee3;
+  --seg-on: #fffdfa;
+  --chip: #f4eee3;
+  --shadow: 0 8px 24px rgba(60, 42, 18, 0.1);
+  --track: #ece3d2;
   --bad: #b42318;
 
   /* Risk levels: Low, Moderate, High, Severe, No travel — fill + tint pairs */
@@ -47,31 +47,34 @@
 }
 
 :root[data-theme="dark"] {
-  --bg: #0b0f14;
-  --surface: #12171e;
-  --surface-2: #1a2029;
-  --ink: #e8ecf1;
-  --muted: #9aa4b2;
-  --line: #262d38;
-  --line-2: #1f2630;
-  --accent: #60a5fa;
-  --accent-tint: #16243a;
-  --on-accent: #0b0f14;
-  --btn: #e8ecf1;
-  --on-btn: #0b0f14;
+  /* Same warm amber brand as light mode (index.css light tokens above),
+     carried into a warm dark brown background instead of the old cool
+     navy-black — so the two themes read as one brand, not two apps. */
+  --bg: #1b140d;
+  --surface: #241b12;
+  --surface-2: #2c2116;
+  --ink: #f3ead9;
+  --muted: #b3a08a;
+  --line: #3a2d1d;
+  --line-2: #332818;
+  --accent: #e8a24d;
+  --accent-tint: #3a2a14;
+  --on-accent: #1b140d;
+  --btn: #e8a24d;
+  --on-btn: #1b140d;
   --rec-bg: #10291b;
   --rec-ink: #7dd3a0;
-  --land: #151b22;
-  --casing: #0b0f14;
-  --route-other: #aab3c0;
-  --route-other-casing: #2a323d;
-  --input-bg: #0b0f14;
-  --input-border: #323b47;
-  --seg-bg: #0b0f14;
-  --seg-on: #262d38;
-  --chip: #222a35;
+  --land: #211810;
+  --casing: #1b140d;
+  --route-other: #a99a82;
+  --route-other-casing: #3a2d1d;
+  --input-bg: #231a10;
+  --input-border: #4a3b27;
+  --seg-bg: #231a10;
+  --seg-on: #3a2d1d;
+  --chip: #332818;
   --shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
-  --track: #1f2630;
+  --track: #3a2d1d;
   --bad: #ff8a80;
 
   --risk-0: #43c07a;

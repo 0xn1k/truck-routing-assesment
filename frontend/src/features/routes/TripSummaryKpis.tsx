@@ -40,21 +40,21 @@ export function TripSummaryKpis({ route, letter, departureIso }: TripSummaryKpis
       style={{ background: "var(--surface)", border: "1px solid var(--line)" }}
     >
       <SectionHeader>Trip summary · recommended route</SectionHeader>
-      <div className="mt-[18px] grid grid-cols-2 gap-3 sm:grid-cols-3">
+      <div className="mt-[18px] flex flex-wrap gap-2.5">
         {tiles.map(({ icon: Icon, label, value, warn }) => (
           <div
             key={label}
-            className="flex min-w-0 items-center gap-3 rounded-[14px] p-3.5"
+            className="flex min-w-0 items-center gap-2.5 rounded-[14px] p-3"
             style={{ background: "var(--surface-2)", border: "1px solid var(--line)" }}
           >
             <span
-              className="flex h-10 w-10 flex-none items-center justify-center rounded-[11px]"
+              className="flex h-9 w-9 flex-none items-center justify-center rounded-[11px]"
               style={{
                 background: warn ? "var(--risk-3-tint)" : "var(--accent-tint)",
                 color: warn ? "var(--risk-3)" : "var(--accent)",
               }}
             >
-              <Icon size={19} />
+              <Icon size={17} />
             </span>
             <div className="min-w-0">
               <div className="truncate text-xs" style={{ color: "var(--muted)" }}>

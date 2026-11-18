@@ -33,19 +33,21 @@ export function RouteList({ plan, selectedRouteId, onSelectRoute, onOpenDetails 
       {fewerRoutesMatch && <FewerRoutesBanner count={plan.routes.length} />}
       <RecommendationBanner reason={plan.recommendation_reason} />
 
-      {routes.map((route, index) => (
-        <RouteCard
-          key={route.id}
-          route={route}
-          letter={LETTERS[index] ?? String(index + 1)}
-          totalRoutes={plan.routes.length}
-          isSelected={route.id === selectedRouteId}
-          isRecommended={route.id === plan.recommended_route_id}
-          isFastest={route.id === fastestId}
-          onSelect={() => onSelectRoute(route.id)}
-          onOpenDetails={() => onOpenDetails(route.id)}
-        />
-      ))}
+      <div className="grid grid-cols-1 items-stretch gap-3.5 md:grid-cols-3">
+        {routes.map((route, index) => (
+          <RouteCard
+            key={route.id}
+            route={route}
+            letter={LETTERS[index] ?? String(index + 1)}
+            totalRoutes={plan.routes.length}
+            isSelected={route.id === selectedRouteId}
+            isRecommended={route.id === plan.recommended_route_id}
+            isFastest={route.id === fastestId}
+            onSelect={() => onSelectRoute(route.id)}
+            onOpenDetails={() => onOpenDetails(route.id)}
+          />
+        ))}
+      </div>
     </div>
   );
 }

@@ -25,43 +25,49 @@ export function RouteCard({
 }: RouteCardProps) {
   return (
     <article
-      className="rounded-2xl p-[18px]"
+      className="flex h-full flex-col rounded-2xl p-[18px]"
       style={{
         border: `${isSelected ? 2 : 1}px solid ${isSelected ? "var(--accent)" : "var(--line)"}`,
         background: "var(--surface)",
         boxShadow: isSelected ? "var(--shadow)" : "none",
       }}
     >
-      <div className="flex flex-wrap items-center gap-2.5">
-        <span
-          className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-full text-sm font-bold"
-          style={{
-            background: isSelected ? "var(--accent)" : "var(--chip)",
-            color: isSelected ? "var(--on-accent)" : "var(--ink)",
-          }}
-        >
-          {letter}
-        </span>
-        <h3 className="m-0 text-[17px] font-bold" style={{ color: "var(--ink)" }}>
-          Route {letter}
-        </h3>
-        {isRecommended && (
+      <div className="flex items-center justify-between gap-2.5">
+        <div className="flex min-w-0 flex-wrap items-center gap-2.5">
           <span
-            className="rounded-full px-2.5 py-1 text-xs font-semibold"
-            style={{ background: "var(--rec-bg)", color: "var(--rec-ink)" }}
+            className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-full text-sm font-bold"
+            style={{
+              background: isSelected ? "var(--accent)" : "var(--chip)",
+              color: isSelected ? "var(--on-accent)" : "var(--ink)",
+            }}
           >
-            Recommended
+            {letter}
           </span>
-        )}
-        {isFastest && (
-          <span
-            className="rounded-full px-2.5 py-1 text-xs font-semibold"
-            style={{ background: "var(--chip)", color: "var(--ink)" }}
-          >
-            Fastest
-          </span>
-        )}
-        <span className="ml-auto text-xs font-semibold" style={{ color: "var(--muted)" }}>
+          <h3 className="m-0 text-[17px] font-bold" style={{ color: "var(--ink)" }}>
+            Route {letter}
+          </h3>
+          {isRecommended && (
+            <span
+              className="rounded-full px-2.5 py-1 text-xs font-semibold"
+              style={{ background: "var(--rec-bg)", color: "var(--rec-ink)" }}
+            >
+              Recommended
+            </span>
+          )}
+          {isFastest && (
+            <span
+              className="rounded-full px-2.5 py-1 text-xs font-semibold"
+              style={{ background: "var(--chip)", color: "var(--ink)" }}
+            >
+              Fastest
+            </span>
+          )}
+        </div>
+        {/* Always its own element at the end of the header row (never
+            wrapping in-line with the badges) so every card's header takes
+            the same number of lines regardless of how many badges a given
+            route has — that's what kept route cards from matching height. */}
+        <span className="flex-none text-xs font-semibold" style={{ color: "var(--muted)" }}>
           Rank {route.rank} of {totalRoutes}
         </span>
       </div>
@@ -85,7 +91,10 @@ export function RouteCard({
         <RiskBar milesByLevel={route.summary.miles_by_level} />
       </div>
 
-      <div className="mt-4 flex gap-2">
+      {/* mt-auto pins the buttons to the bottom of the card regardless of
+          how many lines the content above took up, so all 3 cards' button
+          rows line up even if their header/label wrapped differently. */}
+      <div className="mt-auto flex gap-2 pt-4">
         <button
           type="button"
           onClick={onSelect}
@@ -118,7 +127,7 @@ function Stat({ label, value, warn }: { label: string; value: string; warn?: boo
         {label}
       </div>
       <div
-        className="mt-0.5 text-[15px] font-semibold"
+        className="mt-0.5 whitespace-nowrap text-[13.5px] font-semibold"
         style={{ color: warn ? "var(--bad)" : "var(--ink)" }}
       >
         {value}

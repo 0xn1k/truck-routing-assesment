@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { useHealthCheck, useHeatmap, useTripPlan } from "@/api/hooks";
 import { ApiError, type TripPlanRequest } from "@/api/types";
 import { ErrorBanner, WakingUpBanner } from "@/lib/Banner";
-import { ChevronLeftIcon, MoonIcon, SunIcon, TruckIcon } from "@/lib/icons";
+import { ChevronLeftIcon, MoonIcon, PlayIcon, SunIcon, TruckIcon } from "@/lib/icons";
 import { formatLoad } from "@/lib/format";
+import { SectionHeader } from "@/lib/SectionHeader";
 import { sortByRank } from "@/lib/routeOrder";
 import { useUiStore } from "@/state/uiStore";
 import { ForecastSlider } from "@/features/forecast/ForecastSlider";
@@ -12,7 +13,7 @@ import { MiniTripSummary } from "@/features/trip-form/MiniTripSummary";
 import { RankingExplainer } from "@/features/trip-form/RankingExplainer";
 import { TripErrorModal } from "@/features/trip-form/TripErrorModal";
 import { TripForm, type TripFormPrefill, type TripSubmitValues } from "@/features/trip-form/TripForm";
-import { TryExamples } from "@/features/trip-form/TryExamples";
+import { TryExamplesModal } from "@/features/trip-form/TryExamples";
 import { RouteDetailsModal } from "@/features/routes/RouteDetailsModal";
 import { PlanningProgress } from "@/features/routes/PlanningProgress";
 import { RouteList } from "@/features/routes/RouteList";
@@ -38,6 +39,7 @@ export default function App() {
   const [lastRequest, setLastRequest] = useState<TripPlanRequest | null>(null);
   const [prefill, setPrefill] = useState<TripFormPrefill | null>(null);
   const [errorDismissed, setErrorDismissed] = useState(false);
+  const [examplesOpen, setExamplesOpen] = useState(false);
   const heatmap = useHeatmap(tripPlan.data?.plan_id ?? null);
 
   useEffect(() => {
@@ -60,12 +62,14 @@ export default function App() {
     tripPlan.mutate(request);
   }
 
-  // "Try an example" only fills the visible form fields — it deliberately
-  // does NOT submit on its own. The user still has to review what got
-  // filled in and press "Find the safest route" themselves, same as if
-  // they'd typed it all in by hand.
+  // Unlike manually editing the form, picking an example fills the visible
+  // fields AND plans the trip immediately — the point of "try an example"
+  // is a one-click result, not a form-filling shortcut you still have to
+  // submit yourself.
   function selectExample(values: TripSubmitValues) {
     setPrefill({ values, token: Date.now() });
+    setExamplesOpen(false);
+    submitTrip(values);
   }
 
   const isCollapsed = Boolean(lastRequest) && !formExpanded;
@@ -128,35 +132,68 @@ export default function App() {
       </header>
 
       <div className="mx-auto flex max-w-[1680px] flex-wrap items-start gap-6 px-7 py-6">
-        <aside
-          aria-label="Trip details"
-          className={`w-full rounded-[20px] p-6 desktop:flex-none ${
+        <div
+          className={`flex w-full flex-col gap-3 desktop:flex-none ${
             isCollapsed ? "desktop:w-[200px]" : "desktop:w-[340px]"
           }`}
-          style={{ background: "var(--surface)", border: "1px solid var(--line)" }}
         >
-          <div className="flex items-center justify-between gap-2">
-            <h2
-              className="m-0 text-[12.5px] font-semibold uppercase tracking-[0.14em]"
-              style={{ color: "var(--muted)" }}
+          {!isCollapsed && (
+            <button
+              type="button"
+              onClick={() => setExamplesOpen(true)}
+              className="flex w-full items-center gap-3 rounded-[14px] p-3.5 text-left transition-transform hover:scale-[1.015]"
+              style={{
+                background: "var(--accent-tint)",
+                border: "1px solid var(--accent)",
+                boxShadow: "var(--shadow)",
+              }}
             >
-              Trip details
-            </h2>
-            {/* Collapsing only makes sense once there's a planned trip to
-                summarize in its place — before that, the sidebar is just
-                the form, nothing to collapse to. */}
-            {lastRequest && !isCollapsed && (
-              <button
-                type="button"
-                onClick={() => setFormExpanded(false)}
-                aria-label="Collapse trip details"
-                className="flex h-7 w-7 flex-none items-center justify-center rounded-md"
+              <span
+                className="flex h-10 w-10 flex-none items-center justify-center rounded-full"
+                style={{ background: "var(--accent)", color: "var(--on-accent)" }}
+              >
+                <PlayIcon size={15} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-bold" style={{ color: "var(--accent)" }}>
+                  Try an example
+                </span>
+                <span className="block truncate text-xs" style={{ color: "var(--muted)" }}>
+                  See a full planned trip in one click
+                </span>
+              </span>
+              <span className="flex-none text-lg" style={{ color: "var(--accent)" }}>
+                →
+              </span>
+            </button>
+          )}
+          <aside
+            aria-label="Trip details"
+            className="w-full rounded-[20px] p-6"
+            style={{ background: "var(--surface)", border: "1px solid var(--line)" }}
+          >
+            <div className="flex items-center justify-between gap-2">
+              <h2
+                className="m-0 text-[12.5px] font-semibold uppercase tracking-[0.14em]"
                 style={{ color: "var(--muted)" }}
               >
-                <ChevronLeftIcon size={15} />
-              </button>
-            )}
-          </div>
+                Trip details
+              </h2>
+              {/* Collapsing only makes sense once there's a planned trip to
+                  summarize in its place — before that, the sidebar is just
+                  the form, nothing to collapse to. */}
+              {lastRequest && !isCollapsed && (
+                <button
+                  type="button"
+                  onClick={() => setFormExpanded(false)}
+                  aria-label="Collapse trip details"
+                  className="flex h-7 w-7 flex-none items-center justify-center rounded-md"
+                  style={{ color: "var(--muted)" }}
+                >
+                  <ChevronLeftIcon size={15} />
+                </button>
+              )}
+            </div>
 
           {isCollapsed && lastRequest && (
             <div className="mt-4.5">
@@ -181,12 +218,15 @@ export default function App() {
           {!isCollapsed && (
             <>
               <div className="my-5 h-px" style={{ background: "var(--line)" }} />
-              <TryExamples onSelect={selectExample} />
-              <div className="my-5 h-px" style={{ background: "var(--line)" }} />
               <RankingExplainer />
             </>
           )}
         </aside>
+        </div>
+
+        {examplesOpen && (
+          <TryExamplesModal onSelect={selectExample} onClose={() => setExamplesOpen(false)} />
+        )}
 
         <main className="min-w-0 flex-1 flex flex-col gap-5">
           {!plan && !tripPlan.isPending && (
@@ -239,46 +279,45 @@ export default function App() {
                 departureIso={lastRequest!.departure_time}
               />
 
-              <div className="flex flex-wrap gap-5">
-                <div className="w-full desktop:w-[420px] desktop:flex-none">
-                  <RouteList
-                    plan={plan}
+              <RouteList
+                plan={plan}
+                selectedRouteId={selectedRouteId ?? plan.recommended_route_id}
+                onSelectRoute={setSelectedRouteId}
+                onOpenDetails={openDetails}
+              />
+
+              <section
+                aria-label="Route map"
+                className="flex min-w-0 flex-col gap-3 rounded-[20px] p-6"
+                style={{ background: "var(--surface)", border: "1px solid var(--line)" }}
+              >
+                <SectionHeader>Route map</SectionHeader>
+                {/* MapLibre reads this wrapper's rendered size to compute
+                    camera bounds — a flex-1 div with no definite-height
+                    ancestor resolves to its content's intrinsic size
+                    instead of the visible area, which threw fitBounds
+                    off badly. A fixed height keeps the measurement (and
+                    the fit) correct regardless of what else is on the
+                    page. */}
+                <div className="h-[520px]">
+                  <TripMap
+                    routes={plan.routes}
                     selectedRouteId={selectedRouteId ?? plan.recommended_route_id}
-                    onSelectRoute={setSelectedRouteId}
+                    recommendedRouteId={plan.recommended_route_id}
+                    departureIso={lastRequest!.departure_time}
+                    heatmapGrid={heatmap.data}
+                    sliderHour={sliderHour}
+                    showHeatmap={Boolean(heatmap.data)}
+                    originLabel={lastRequest!.origin.label}
+                    destinationLabel={lastRequest!.destination.label}
                     onOpenDetails={openDetails}
                   />
                 </div>
-
-                <div className="flex min-w-0 flex-1 flex-col gap-3">
-                  {/* MapLibre reads this wrapper's rendered size to compute
-                      camera bounds — a flex-1 div with no definite-height
-                      ancestor resolves to its content's intrinsic size
-                      instead of the visible area, which threw fitBounds
-                      off badly. A fixed height keeps the measurement (and
-                      the fit) correct regardless of what else is on the
-                      page. */}
-                  <div className="h-[520px]">
-                    <TripMap
-                      routes={plan.routes}
-                      selectedRouteId={selectedRouteId ?? plan.recommended_route_id}
-                      recommendedRouteId={plan.recommended_route_id}
-                      departureIso={lastRequest!.departure_time}
-                      heatmapGrid={heatmap.data}
-                      sliderHour={sliderHour}
-                      showHeatmap={Boolean(heatmap.data)}
-                      originLabel={lastRequest!.origin.label}
-                      destinationLabel={lastRequest!.destination.label}
-                      onOpenDetails={openDetails}
-                    />
-                  </div>
-                  {heatmap.data && (
-                    <ForecastSlider departureIso={lastRequest!.departure_time} />
-                  )}
-                  {heatmap.isError && (
-                    <ErrorBanner message="Weather data is unavailable right now. The heatmap couldn't be loaded." />
-                  )}
-                </div>
-              </div>
+                {heatmap.data && <ForecastSlider departureIso={lastRequest!.departure_time} />}
+                {heatmap.isError && (
+                  <ErrorBanner message="Weather data is unavailable right now. The heatmap couldn't be loaded." />
+                )}
+              </section>
             </>
           )}
         </main>

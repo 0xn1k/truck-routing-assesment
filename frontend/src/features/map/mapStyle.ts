@@ -1,11 +1,23 @@
 import type { Theme } from "@/lib/theme";
 
-/** OpenFreeMap vector styles — no API key, loaded directly by the browser
- * (top-level README.md Section 2). Basemap switches with the theme so
- * route casings and the heatmap keep their contrast (frontend/README.md
- * Section 9.8). */
-export function basemapStyleUrl(theme: Theme): string {
-  return theme === "dark"
-    ? "https://tiles.openfreemap.org/styles/dark"
-    : "https://tiles.openfreemap.org/styles/positron";
+// Stadia Maps is already this app's routing provider (providers/routing/
+// valhalla.py) — it also hosts map tiles on the same free account, so the
+// terrain basemap below adds no new paid service. Tile requests from
+// localhost/127.0.0.1 work keyless (Stadia's dev allowance); a hosted
+// deployment needs a domain-restricted STADIA_API_KEY (Stadia dashboard)
+// set as VITE_STADIA_API_KEY, or Stadia starts rejecting the requests.
+const STADIA_API_KEY = import.meta.env.VITE_STADIA_API_KEY as string | undefined;
+
+function stadiaStyleUrl(style: string): string {
+  const key = STADIA_API_KEY ? `?api_key=${STADIA_API_KEY}` : "";
+  return `https://tiles.stadiamaps.com/styles/${style}.json${key}`;
+}
+
+/** Same terrain style in both themes, by design — the map's colours are
+ * meant to match exactly, not switch to a separate cool-toned dark vector
+ * style the way the rest of the UI switches. `theme` stays a parameter
+ * (rather than deleting it) since route casings/heatmap contrast still key
+ * off it elsewhere (frontend/README.md Section 9.8). */
+export function basemapStyleUrl(_theme: Theme): string {
+  return stadiaStyleUrl("stamen_terrain");
 }

@@ -106,16 +106,16 @@ export function TripMap({
     // this effect re-runs and retries once the map becomes ready, even if
     // routes arrived first.
     if (!mapLoaded || !mapRef.current) return;
-    // Fit to the SELECTED route only, not every alternative — an
-    // alternate/detour route can swing much wider than the one actually on
-    // screen, forcing the whole camera to zoom out to include a path that
-    // isn't even the focus. Re-fits on every selection change too, so
-    // clicking a different route (sidebar card or the route's own line on
-    // the map) re-frames around it instead of leaving the earlier framing.
-    const target = selectedRoute ?? routes[0];
-    if (!target) return;
-    mapRef.current.fitBounds(boundsOf([target]), { padding: 56, duration: 600 });
-  }, [mapLoaded, selectedRoute, routes]);
+    // Fit to EVERY route, not just the selected one — unselected routes are
+    // drawn faded-but-visible (RouteLayer.tsx), so the camera needs to keep
+    // them in frame or they're effectively invisible anyway, off-screen.
+    // Deliberately NOT keyed on selectedRoute: all 3 routes' combined bounds
+    // don't change when you switch which one is selected, so there's
+    // nothing to re-fit — re-running this per selection just replayed the
+    // same animation for no reason.
+    if (!routes.length) return;
+    mapRef.current.fitBounds(boundsOf(routes), { padding: 56, duration: 600 });
+  }, [mapLoaded, routes]);
 
   // Both the wide casing and the narrower coloured line are clickable —
   // the casing is the easier target to actually hit with a pointer.
@@ -183,6 +183,7 @@ export function TripMap({
           <HeatmapLayer
             grid={heatmapGrid}
             hour={sliderHour}
+            themeVersion={theme}
             beforeId={`route-${selectedRouteId}-casing`}
           />
         )}

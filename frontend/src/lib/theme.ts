@@ -8,9 +8,12 @@ export function getStoredTheme(): Theme {
     if (stored === "light" || stored === "dark") return stored;
   } catch {
     // localStorage can throw in a private window or with site data blocked —
-    // fall through to the system preference.
+    // nothing stored either way, so fall through to the default below.
   }
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  // Default to light regardless of OS preference — a first-time visitor
+  // always lands on light mode; dark mode is opt-in via the toggle, not
+  // inherited from prefers-color-scheme.
+  return "light";
 }
 
 export function applyTheme(theme: Theme): void {
